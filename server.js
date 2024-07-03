@@ -10,9 +10,18 @@ const io = socketIo(server, {
     },
 });
 
+let messages = [];
+
 io.on("connection", (socket) => {
-    console.log("Nice to meet you. (shake hand)");
-    socket.emit("welcome", "Welcome to the server!");
+    console.log("User connected");
+
+    // Send all previous messages to the newly connected user
+    socket.emit("previousMessages", messages);
+
+    socket.on("newMessage", (message) => {
+        messages.push(message);
+        io.emit("newMessageFromServer", message);
+    });
 
     socket.on("disconnect", () => {
         console.log("User disconnected");
